@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Sarabun:400,700" rel="stylesheet">
+    <title>Covidassist</title>
+</head>
+
+<body>
+
+    <h1 id="title">Covid Assist</h1>
+    <p><button type="button" onclick="runSpeechRecognition()">Covid Questions</button> &nbsp; <span id="action"></span>
+    </p>
+    <div id="output" class="hide"></div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        /* JS comes here */
+        function runSpeechRecognition() {
+            // get output div reference
+            var output = document.getElementById("output");
+            // get action element reference
+            var action = document.getElementById("action");
+            // new speech recognition object
+            var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+            var recognition = new SpeechRecognition();
+
+            // This runs when the speech recognition service starts
+            recognition.onstart = function () {
+                action.innerHTML = "<small>listening, please speak...</small>";
+            };
+
+            recognition.onspeechend = function () {
+                action.innerHTML = "<small>stopped listening, hope you are done...</small>";
+                recognition.stop();
+            }
+
+            // This runs when the speech recognition service returns result
+            recognition.onresult = function (event) {
+                var transcript = event.results[0][0].transcript;
+                var confidence = event.results[0][0].confidence;
+                axios.post('http://localhost:8000/api/Question/', {
+                        question: transcript,
+                    })
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                output.innerHTML = "<b>Text:</b> " + transcript + "<br /> <b>Confidence:</b> " +
+                    confidence *
+                    100 + "%";
+                output.classList.remove("hide");
+            };
+
+            // start recognition
+            recognition.start();
+        }
+    </script>
+</body>
+
+</html>
+<style>
+    body {
+        background: rgba(204, 229, 255, 0.4);
+        font-size: 1.15em;
+        text-align: justify;
+        font-family: "Lato", sans-serif;
+    }
+
+    #title {
+        text-align: center;
+        padding-right: 45px;
+        color: rgb(186, 133, 9);
+        font-family: "Sarabun", sans-serif;
+    }
+
+    .italics {
+        font-style: italic;
+    }
+
+    button {
+        margin: 0;
+        position: absolute;
+        top: 35%;
+        left: 35%;
+        background-color: darkred;
+        border: none;
+        color: white;
+        padding: 150px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 45px;
+        margin: 4px 2px;
+        border-radius: 50%
+    }
+
+    /* 
+    .notRec {
+        background-color: darkred;
+    }
+
+    .Rec {
+        animation-name: pulse;
+        animation-duration: 1.5s;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+    } */
+    */
+</style>
