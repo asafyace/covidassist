@@ -8,7 +8,6 @@
 </head>
 
 <body>
-
     <h1 id="title">Covid Assist</h1>
     <p><button type="button" onclick="runSpeechRecognition()">Covid Questions</button> &nbsp; <span id="action"></span>
     </p>
@@ -41,6 +40,15 @@
                 var confidence = event.results[0][0].confidence;
                 axios.post('http://localhost:8000/api/Question/', {
                         question: transcript,
+                    }, {
+                        withCredentials: true,
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        auth: {
+                            username: 'ayaron',
+                            password: 'AAAaaa123',
+                        },
                     })
                     .then(function (response) {
                         console.log(response);
@@ -96,17 +104,4 @@
         margin: 4px 2px;
         border-radius: 50%
     }
-
-    /* 
-    .notRec {
-        background-color: darkred;
-    }
-
-    .Rec {
-        animation-name: pulse;
-        animation-duration: 1.5s;
-        animation-iteration-count: infinite;
-        animation-timing-function: linear;
-    } */
-    */
 </style>
